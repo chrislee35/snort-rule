@@ -13,16 +13,18 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "snort-rule"
-  gem.homepage = "http://github.com/chrislee35/snort-rule"
+  gem.homepage = "https://rubygems.org/gems/snort-rule"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "chrislee-AT-gatechedu"
-  gem.authors = ["Chris Lee, PhD"]
-  # Include your dependencies below. Runtime dependencies are required when using your gem,
-  # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
-  #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
-  #  gem.add_development_dependency 'rspec', '> 1.2.3'
+  gem.summary = %Q{Class for parsing and generating Snort Rules}
+  gem.description = %Q{arses and generates Snort rules similar to PERL's Snort::Rule}
+	gem.email = "rubygems@chrislee.dhs.org"
+	gem.authors = ["Chris Lee"]
+	# Include your dependencies below. Runtime dependencies are required when using your gem,
+	# and development dependencies are only needed for development (ie running rake tasks, tests, etc)
+	gem.signing_key = "#{ENV['HOME']}/bin/ruby/rubygems/gem-private_key.pem"
+	gem.cert_chain  = ["#{ENV['HOME']}/bin/ruby/rubygems/gem-public_cert.pem"]
+	gem.files = FileList["{bin,lib}/**/*"].to_a
+	gem.executables = ["snortrule"]
 end
 Jeweler::RubygemsDotOrgTasks.new
 

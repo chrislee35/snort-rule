@@ -1,0 +1,1 @@
+require 'snort-rule/base'
