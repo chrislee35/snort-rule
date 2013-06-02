@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # DESCRIPTION: generates and parses snort rules
 require 'getoptlong'
+require 'snort/rule'
 
 def usage
 	puts "Usage: #{$0} [-h] [-a <action>] [-p <protocol>] [-s <srcip>] [-x <srcport>] [-w <direction>] [-d <dstip>] [-c <dstport>] [-o <key:value>] [-o <key:value> ...]"
