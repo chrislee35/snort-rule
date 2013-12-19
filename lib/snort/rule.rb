@@ -23,15 +23,20 @@ module Snort
 		# Output the current object into a snort rule
 		def to_s(options_only=false)
 			rule = ""
-			rule = [@action, @proto, @src, @sport, @dir, @dst, @dport, '( '].join(" ") unless options_only
-			opts.keys.sort.each do |k|
-				rule += k if opts[k];
-				unless opts[k] == true
-					rule += ":#{opts[k]}"
-				end
-				rule += "; "
-			end
-			rule += ")" unless options_only
+			rule = [@action, @proto, @src, @sport, @dir, @dst, @dport].join(" ") unless options_only
+			
+			if opts
+  		  rule += "(" unless options_only
+  			opts.keys.sort.each do |k|
+	  			rule += k if opts[k];
+		  		unless opts[k] == true
+			  		rule += ":#{opts[k]}"
+			  	end
+				  rule += "; "
+			  end
+			  rule += ")" unless options_only
+		  end
+		  
 			rule
 		end
 		
@@ -46,7 +51,7 @@ module Snort
 				else
 					[x,true]
 				end
-			}]
+			}] if optspart
 			rule
 		end
 	end
