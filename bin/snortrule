@@ -50,9 +50,9 @@ opts.each do |opt, arg|
 		rule.dport = arg.to_i
 	when '--opts'
 		if arg =~ /(.+?)\s*[=:]\s*(.+)/
-			rule.opts[$1] = $2
+			rule.options << Snort::RuleOption($1,$2)
 		else
-			rule.opts[arg] = true
+			rule.options << Snort::RuleOption(arg)
 		end
 	else
 		usage
