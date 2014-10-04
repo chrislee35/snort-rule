@@ -19,6 +19,7 @@ end
 
 opts = GetoptLong.new(
 	[ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+	[ '--rule', '-r', GetoptLong::REQUIRED_ARGUMENT ],
 	[ '--action', '-a', GetoptLong::REQUIRED_ARGUMENT ],
 	[ '--proto', '-p', GetoptLong::REQUIRED_ARGUMENT ],
 	[ '--src', '-s', GetoptLong::REQUIRED_ARGUMENT ],
@@ -34,6 +35,9 @@ opts.each do |opt, arg|
 	case opt
 	when '--help'
 		usage
+	when '--rule'
+		# TODO: regex sanity check here? better to fail gracefully.
+		rule = Snort::Rule.parse(arg)
 	when '--action'
 		rule.action = arg
 	when '--proto'
