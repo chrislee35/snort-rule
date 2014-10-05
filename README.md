@@ -19,10 +19,11 @@ Or install it yourself as:
 ## Usage
 
 	rule = Snort::Rule.new({:action => 'pass', :proto => 'udp', :src => '192.168.0.1', :sport => 'any', :dir => '<>', :dst => 'any', :dport => 53, :opts => {'sid' => 48, 'threshold' => 'type limit,track by_src,count 1,seconds 3600' }})
-	
+
 	rule.to_s => "pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )"
 
 	rule = Snort::Rule.new
+  rule.enabled = false
 	rule.action = 'pass'
 	rule.proto = 'udp'
 	rule.src = '192.168.0.1'
@@ -30,8 +31,8 @@ Or install it yourself as:
 	rule.dport = 53
 	rule.opts['sid'] = 48
 	rule.opts['threshold'] = 'type limit,track by_src,count 1,seconds 3600'
-	
-	rule.to_s => "pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )"
+
+	rule.to_s => "#pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )"
 
 	rule = Snort::Rule.parse("pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )")
 	rule.to_s => "pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )"
