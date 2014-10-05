@@ -27,7 +27,10 @@ module Snort
     # @option kwargs[Array<Snort::RuleOption>] :options The better way of passing in options, using
     #   option objects that know how to represent themselves as a string properly
     def initialize(kwargs={})
-      @enabled = kwargs[:enabled] || true
+      @enabled = true
+      if kwargs.has_key?(:enabled) and (not kwargs[:enabled] or ['false', 'no', 'off'].index(kwargs[:enabled].to_s.downcase))
+        @enabled = false
+      end
       @action = kwargs[:action] || 'alert'
       @proto = kwargs[:proto] || 'IP'
       @src = kwargs[:src] || 'any'
@@ -40,9 +43,8 @@ module Snort
 
     # Output the current object into a snort rule
     def to_s(options_only=false)
-      if @enabled
-        rule = ""
-      else
+      rule = ""
+      if not @enabled
         rule = "#"
       end
       rule += [@action, @proto, @src, @sport, @dir, @dst, @dport].join(" ") unless options_only
@@ -65,6 +67,10 @@ module Snort
       end
       rulepart, optspart = string.split(/\s*\(\s*/,2)
       rule.action, rule.proto, rule.src, rule.sport, rule.dir, rule.dst, rule.dport = rulepart.split(/\s+/)
+      if not ['<>', '<-', '->'].index(rule.dir)
+        # most likely, I have a parse error, maybe it's just a random comment
+        raise ArgumentError.new("Unable to parse rule, #{rulepart}")
+      end
       optspart.gsub(/;\s*\).*$/,'').split(/\s*;\s*/).each do |x|
         if x =~ /(.*?):(.*)/
           rule.options << Snort::RuleOption.new(*x.split(/:/,2))

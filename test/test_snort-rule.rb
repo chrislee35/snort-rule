@@ -10,7 +10,7 @@ require_relative 'helper'
 
 class TestSnortRule < Minitest::Test
   def test_constructor_should_set_all_the_parameters_and_generate_the_correct_rule
-    rule = Snort::Rule.new({:enabled => '', :action => 'pass', :proto => 'udp', :src => '192.168.0.1', :sport => 'any', :dir => '<>',
+    rule = Snort::Rule.new({:enabled => true, :action => 'pass', :proto => 'udp', :src => '192.168.0.1', :sport => 'any', :dir => '<>',
       :dst => 'any', :dport => 53,
       :options => [Snort::RuleOption.new('sid', 48), Snort::RuleOption.new('threshold', 'type limit,track by_src,count 1,seconds 3600')]
     })
@@ -91,6 +91,12 @@ class TestSnortRule < Minitest::Test
   def test_parse_a_disabled_rule_and_generate_the_normalized_disabled_rule
     rule = Snort::Rule.parse("### pass udp 192.168.0.1 any <> any 53 (   sid:48;     threshold:type limit,track by_src,count 1,seconds 3600; )")
     assert_equal rule.to_s, "#pass udp 192.168.0.1 any <> any 53 (sid:48; threshold:type limit,track by_src,count 1,seconds 3600;)"
+  end
+
+  def test_parse_a_garbled_rule_and_throws_an_exception
+    assert_raises ArgumentError do
+      Snort::Rule.parse("pass udp 192.168.0.1 bla bla bla 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )")
+    end
   end
 
 end

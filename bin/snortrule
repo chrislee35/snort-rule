@@ -4,8 +4,9 @@ require 'getoptlong'
 require 'snort/rule'
 
 def usage
-	puts "Usage: #{$0} [-h] [-a <action>] [-p <protocol>] [-s <srcip>] [-x <srcport>] [-w <direction>] [-d <dstip>] [-c <dstport>] [-o <key:value>] [-o <key:value> ...]"
+	puts "Usage: #{$0} [-hE] [-a <action>] [-p <protocol>] [-s <srcip>] [-x <srcport>] [-w <direction>] [-d <dstip>] [-c <dstport>] [-o <key:value>] [-o <key:value> ...]"
 	puts "-h             This text."
+  puts "-E             Not enabled.  i.e., commented out"
 	puts "-a <action>    alert, log, pass, ... : alert"
 	puts "-p <protocol>  ip, udp, tcp, ... : ip"
 	puts "-s <srcip>     dotted quad IP address : any"
@@ -19,6 +20,7 @@ end
 
 opts = GetoptLong.new(
 	[ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--disabled', '-E', GetoptLong::NO_ARGUMENT ],
 	[ '--rule', '-r', GetoptLong::REQUIRED_ARGUMENT ],
 	[ '--action', '-a', GetoptLong::REQUIRED_ARGUMENT ],
 	[ '--proto', '-p', GetoptLong::REQUIRED_ARGUMENT ],
@@ -35,6 +37,8 @@ opts.each do |opt, arg|
 	case opt
 	when '--help'
 		usage
+  when '--disabled'
+    rule.enabled = false
 	when '--rule'
 		# TODO: regex sanity check here? better to fail gracefully.
 		rule = Snort::Rule.parse(arg)
