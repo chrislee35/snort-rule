@@ -7,6 +7,7 @@ def usage
 	puts "Usage: #{$0} [-hE] [-a <action>] [-p <protocol>] [-s <srcip>] [-x <srcport>] [-w <direction>] [-d <dstip>] [-c <dstport>] [-o <key:value>] [-o <key:value> ...]"
 	puts "-h             This text."
   puts "-E             Not enabled.  i.e., commented out"
+	puts "-r <rule>      full rule text for parsing and echoing back"
 	puts "-a <action>    alert, log, pass, ... : alert"
 	puts "-p <protocol>  ip, udp, tcp, ... : ip"
 	puts "-s <srcip>     dotted quad IP address : any"
