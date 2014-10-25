@@ -41,10 +41,10 @@ Or install it yourself as:
 	rule.options_hash["ref"] == "ref2"
 
 	# if the rule is disabled, then it will begin with a #
-	rule.to_s => "#pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )"
+	rule.to_s => "#pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600;  ref:ref1; ref:ref2;)"
 
-	rule = Snort::Rule.parse("pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )")
-	rule.to_s => "pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )"
+	rule = Snort::Rule.parse("pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600;  ref:ref1; ref:ref2;)")
+	rule.to_s => "pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600;  ref:ref1; ref:ref2;)"
 
 ## Contributing
 
