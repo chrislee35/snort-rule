@@ -11,10 +11,8 @@ module Snort
     end
 
     def to_s
-      output = @keyword
-      output << ":#{@arguments}" unless @arguments.empty?
-      output << ';'
-      output
+      return "#{@keyword};" if @arguments.empty?
+      "#{@keyword}:#{@arguments};"
     end
 
     def ==(other)

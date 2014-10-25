@@ -11,7 +11,7 @@ module Snort
 
   # This class stores and generates the features of a snort rule
   class Rule
-    attr_accessor :enabled, :action, :proto, :src, :sport, :dir, :dst, :dport
+    attr_accessor :enabled, :action, :proto, :src, :sport, :dir, :dst, :dport, :options_hash
     attr_reader :options
 
     # Initializes the Rule
@@ -39,6 +39,7 @@ module Snort
       @dst = kwargs[:dst] || 'any'
       @dport = kwargs[:dport] || 'any'
       @options = kwargs[:options] || []
+      @options_hash = Hash[@options.map {|x| [x.keyword, x.arguments]}]
     end
 
     # Output the current object into a snort rule
@@ -48,12 +49,27 @@ module Snort
         rule = "#"
       end
       rule += [@action, @proto, @src, @sport, @dir, @dst, @dport].join(" ") unless options_only
-      if options.any?
+      if @options.any?
         rule += " (" unless options_only
-        rule += options.join(' ')
+        rule += @options.join(' ')
         rule += ")" unless options_only
       end
       rule
+    end
+    
+    def add_option(option)
+      @options << option
+      @options_hash = Hash[@options.map {|x| [x.keyword, x.arguments]}]
+    end
+    
+    def del_option(option)
+      @options.delete(option)
+      @options_hash = Hash[@options.map {|x| [x.keyword, x.arguments]}]
+    end
+    
+    def clear_options()
+      @options = []
+      @options_hash = {}
     end
 
     # Parse a snort rule to generate an object
@@ -78,6 +94,7 @@ module Snort
           rule.options << Snort::RuleOption.new(x)
         end
       end if optspart
+      rule.options_hash = Hash[rule.options.map {|x| [x.keyword, x.arguments]}]
       rule
     end
   end

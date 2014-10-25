@@ -30,8 +30,15 @@ Or install it yourself as:
 	rule.src = '192.168.0.1'
 	rule.dir = '<>'
 	rule.dport = 53
-	rule.opts['sid'] = 48
-	rule.opts['threshold'] = 'type limit,track by_src,count 1,seconds 3600'
+	rule.options << Snort::RuleOption.new('sid', 48)
+	rule.options << Snort::RuleOption.new('threshold', 'type limit,track by_src,count 1,seconds 3600')
+	rule.options << Snort::RuleOption.new('ref', 'ref1')
+	rule.options << Snort::RuleOption.new('ref', 'ref2')
+	rule.options.each do |opt|
+		puts opt
+	end
+	rule.options_hash["sid"] == 48
+	rule.options_hash["ref"] == "ref2"
 
 	# if the rule is disabled, then it will begin with a #
 	rule.to_s => "#pass udp 192.168.0.1 any <> any 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )"
