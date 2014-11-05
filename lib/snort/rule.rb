@@ -5,6 +5,7 @@ require "snort/rule/option"
 # Authors::   Chris Lee  (mailto:rubygems@chrislee.dhs.org),
 #             Will Green (will[ at ]hotgazpacho[ dot ]org),
 #             Justin Knox (jknox[ at ]indexzero[ dot ]org)
+#             Ryan Barnett (rbarnett[ at ]modsecurity[ dot ]org)
 # Copyright:: Copyright (c) 2011 Chris Lee
 # License::   Distributes under the same terms as Ruby
 module Snort
@@ -13,7 +14,87 @@ module Snort
   class Rule
     attr_accessor :enabled, :action, :proto, :src, :sport, :dir, :dst, :dport, :options_hash
     attr_reader :options
-
+    ARGLESS = [
+      "http_method", 
+			"ftpbounce",
+			"file_data",
+			"nocase",
+			"rawbytes",
+			"dce_stub_data",
+			"fast_pattern",
+			"http_client_body", 
+			"http_header",
+			"http_raw_cookie",
+			"http_raw_header",
+			"http_method",
+			"http_uri",
+			"http_stat_code",
+			"http_stat_msg",
+			"http_cookie"
+    ]
+    HKEYWORDS = [
+      "msg",
+			"content",
+			"gid",
+			"sid", 
+			"ttl", 
+			"uricontent",
+			"pcre",
+			"flow",
+			"nocase",
+			"rev",
+			"reference",
+			"classtype",
+			"flowbits",
+			"threshold",
+			"offset",
+			"distance",
+			"within",
+			"offset",
+			"depth",
+			"dsize",
+			"byte_test",
+			"byte_jump",
+			"rawbytes",
+			"isdataat",
+			"ipopts",
+			"tag",
+			"itype",
+			"icode",
+			"flags",
+			"urilen",
+			"fragbits",
+			"fragoffset",
+			"seq",
+			"ack",
+			"window",
+			"id",
+			"ip_proto",
+			"metadata",
+			"priority",
+			"fwsam",
+			"asn1",
+			"http_client_body",
+			"http_cookie",
+			"dce_stub_data",
+			"dce_iface",
+			"dce_opnum",
+			"http_header",
+			"icmp_id",
+			"icmp_seq",
+			"fast_pattern",
+			"http_method",
+			"ftpbounce",
+			"http_encode",
+			"http_stat_code",
+			"http_stat_msg",
+      "http_uri",
+      "ssl_version",
+      "ssl_state",
+			"detection_filter",
+			"file_data"
+    ]
+    
     # Initializes the Rule
     # @param [Hash] kwargs The options to initialize the Rule with
     # @option kwargs [String] :enabled true or false
@@ -38,8 +119,13 @@ module Snort
       @dir = kwargs[:dir] || '->'
       @dst = kwargs[:dst] || 'any'
       @dport = kwargs[:dport] || 'any'
-      @options = kwargs[:options] || []
-      @options_hash = Hash[@options.map {|x| [x.keyword, x.arguments]}]
+      @options = []
+      @options_hash = {}
+      if kwargs[:options]
+        kwargs[:options].each do |opt|
+          add_option(opt)
+        end
+      end
     end
 
     # Output the current object into a snort rule
@@ -58,13 +144,21 @@ module Snort
     end
     
     def add_option(option)
+      if option.class == Array
+        option = Snort::RuleOption.new(option[0], option[1,100])
+      end
       @options << option
-      @options_hash = Hash[@options.map {|x| [x.keyword, x.arguments]}]
+      unless @options_hash[option.keyword]
+        @options_hash[option.keyword] = []
+      end
+      @options_hash[option.keyword] << option
     end
     
     def del_option(option)
       @options.delete(option)
-      @options_hash = Hash[@options.map {|x| [x.keyword, x.arguments]}]
+      if @options_hash[option.keyword]
+        @options_hash[option.keyword].delete(option)
+      end
     end
     
     def clear_options()
@@ -89,12 +183,17 @@ module Snort
       end
       optspart.gsub(/;\s*\).*$/,'').split(/\s*;\s*/).each do |x|
         if x =~ /(.*?):(.*)/
-          rule.options << Snort::RuleOption.new(*x.split(/:/,2))
+          k, v = x.split(/:/, 2)
+          opt = Snort::RuleOption.new(k, v)
+          rule.options << opt
+          unless rule.options_hash[k]
+            rule.options_hash[k] = []
+          end
+          rule.options_hash[k] << opt
         else
-          rule.options << Snort::RuleOption.new(x)
+          rule.options.last.arguments << x
         end
       end if optspart
-      rule.options_hash = Hash[rule.options.map {|x| [x.keyword, x.arguments]}]
       rule
     end
   end

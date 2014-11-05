@@ -38,15 +38,24 @@ class TestSnortRuleOption < Minitest::Test
   end
   
   def test_options_hash
-    strule = 'alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"test"; flow:to_server, established; content:"GET"; http_method; content:"/private.php?"; nocase; http_uri; content:"id="; nocase; http_uri; content:"UNITED"; nocase; http_uri; content:"SELECTED"; nocase; http_uri; pcre:"/UNITED.+SELECTED/Ui"; reference:ref1; reference:ref2; reference:ref3; classtype:test-attack; sid:1234; rev:442;)'
+    strule = 'alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"test"; ' +
+      'flow:to_server, established; '+
+      'content:"GET"; http_method; ' +
+      'content:"/private.php?"; nocase; http_uri; ' +
+      'content:"id="; nocase; http_uri; ' +
+      'content:"UNITED"; nocase; http_uri; ' +
+      'content:"SELECTED"; nocase; http_uri; ' +
+      'pcre:"/UNITED.+SELECTED/Ui"; ' +
+      'reference:ref1; reference:ref2; reference:ref3; ' +
+      'classtype:test-attack; sid:1234; rev:442;)'
     rule = Snort::Rule.parse(strule)
-    assert_equal "\"test\"", rule.options_hash["msg"]
-    assert_equal "to_server, established", rule.options_hash["flow"]
-    assert rule.options_hash["http_method"]
-    assert rule.options_hash["http_method"].empty?
-    assert_equal "ref3", rule.options_hash["reference"]
-    assert rule.options_hash["nocase"]
-    assert rule.options_hash["nocase"].empty?
+    assert_equal ["\"test\""], rule.options_hash["msg"][0].arguments
+    assert_equal ["to_server, established"], rule.options_hash["flow"][0].arguments
+    assert rule.options_hash["content"]
+    assert_equal 5, rule.options_hash["content"].length
+    assert_equal ['"/private.php?"', 'nocase', 'http_uri'], rule.options_hash["content"][1].arguments
+    assert_equal 3, rule.options_hash["reference"].length
+    assert_equal ["ref3"], rule.options_hash["reference"][2].arguments
     assert_nil rule.options_hash["xxxx"]
   end
 

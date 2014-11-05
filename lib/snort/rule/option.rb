@@ -7,12 +7,24 @@ module Snort
     # @param [String] arguments
     def initialize(keyword, arguments=nil)
       @keyword = keyword.to_s
-      @arguments = arguments.to_s
+      if arguments == nil
+        @arguments = []
+      elsif arguments.class == String or arguments.class == Fixnum
+        @arguments = [arguments]
+      elsif arguments.class == Array
+        @arguments = arguments
+      else
+        raise "I don't know what to do with an argument of class #{arguments.class}"
+      end
+    end
+    
+    def add_argument(argument)
+      @arguments << argument
     end
 
     def to_s
-      return "#{@keyword};" if @arguments.empty?
-      "#{@keyword}:#{@arguments};"
+      return "#{@keyword};" if @arguments.length == 0
+      "#{@keyword}:#{@arguments.join("; ")};"
     end
 
     def ==(other)
