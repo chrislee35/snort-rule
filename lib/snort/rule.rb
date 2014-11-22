@@ -123,7 +123,7 @@ module Snort
     # Parse a snort rule to generate an object
     def Rule::parse(string)
       rule = Snort::Rule.new
-      rulestr = string.gsub(/^\s*/,'')
+      rulestr = string.strip
       # If the string begins with /^#+\s*/, then the rule is disabled.
       # If disabled, let's scrub the disabling substring from the string.
       if rulestr.index(/^#/)
