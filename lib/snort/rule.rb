@@ -1,5 +1,6 @@
 require "snort/rule/version"
 require "snort/rule/option"
+require 'pp'
 # Generates and parses snort rules
 #
 # Authors::   Chris Lee  (mailto:rubygems@chrislee.dhs.org),
@@ -85,17 +86,51 @@ module Snort
       @options = []
       @options_hash = {}
     end
+    
+    def get_option(option_name)
+      if @options_hash[option_name]
+        if @options_hash[option_name].length == 1
+          if @options_hash[option_name][0].arguments.length == 1
+            return @options_hash[option_name][0].arguments[0]
+          end
+        end
+      end
+      nil
+    end
+
+    def get_option_first(option_name)
+      if @options_hash[option_name]
+        if @options_hash[option_name].length > 0
+          if @options_hash[option_name][0].arguments.length > 0
+            return @options_hash[option_name][0].arguments[0]
+          end
+        end
+      end
+      nil
+    end
+    
+    def get_option_last(option_name)
+      if @options_hash[option_name]
+        if @options_hash[option_name].length > 0
+          if @options_hash[option_name].last.arguments.length > 0
+            return @options_hash[option_name].last.arguments[0]
+          end
+        end
+      end
+      nil
+    end
 
     # Parse a snort rule to generate an object
     def Rule::parse(string)
       rule = Snort::Rule.new
+      rulestr = string.gsub(/^\s*/,'')
       # If the string begins with /^#+\s*/, then the rule is disabled.
       # If disabled, let's scrub the disabling substring from the string.
-      if string.index(/^#+\s+/)
+      if rulestr.index(/^#/)
         rule.enabled = false
-        string.gsub!(/^#+\s*/,'')
+        rulestr.gsub!(/^#+\s*/,'')
       end
-      rulepart, optspart = string.split(/\s*\(\s*/,2)
+      rulepart, optspart = rulestr.split(/\s*\(\s*/,2)
       rule.action, rule.proto, rule.src, rule.sport, rule.dir, rule.dst, rule.dport = rulepart.split(/\s+/)
       if not ['<>', '<-', '->'].index(rule.dir)
         # most likely, I have a parse error, maybe it's just a random comment
