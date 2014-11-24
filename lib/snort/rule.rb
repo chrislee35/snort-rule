@@ -1,6 +1,5 @@
 require "snort/rule/version"
 require "snort/rule/option"
-require 'pp'
 # Generates and parses snort rules
 #
 # Authors::   Chris Lee  (mailto:rubygems@chrislee.dhs.org),
@@ -64,6 +63,14 @@ module Snort
       rule
     end
     
+    def enable
+      @enabled = true
+    end
+    
+    def disable
+      @enabled = false
+    end
+    
     def add_option(option)
       if option.class == Array
         option = Snort::RuleOption.new(option[0], option[1,100])
@@ -96,6 +103,10 @@ module Snort
         end
       end
       nil
+    end
+    
+    def get_options(option_name)
+      @options_hash[option_name]
     end
 
     def get_option_first(option_name)

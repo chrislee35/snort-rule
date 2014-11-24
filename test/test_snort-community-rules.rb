@@ -7,6 +7,7 @@ unless Kernel.respond_to?(:require_relative)
 end
 
 require_relative 'helper'
+require 'pp'
 
 class TestSnortCommunityRules < Minitest::Test
   def setup
@@ -45,20 +46,45 @@ class TestSnortCommunityRules < Minitest::Test
   end
   
   def test_complete_rules_file
-    rules = []
-    File.open("test/community-rules/community.rules").each_line do |line|
-      next unless line =~ /alert/
-      begin
-        rule = Snort::Rule.parse(line)
-        if rule
-          rules << rule
-        end
-      rescue ArgumentError => e
-      rescue NoMethodError => e
-      end
-    end
+    rules = Snort::RuleSet::from_file("test/community-rules/community.rules")
     assert_equal 3127, rules.length
     assert_equal 2522, rules.count{|r| ! r.enabled}
     assert_equal 605, rules.count{|r| r.enabled}
+    rules.disable_all
+    assert_equal 0, rules.count{|r| r.enabled}
+    assert_equal 3127, rules.count{|r| ! r.enabled}
+    rules.enable_all
+    assert_equal 3127, rules.count{|r| r.enabled}
+    assert_equal 0, rules.count{|r| ! r.enabled}
+    rules.disable do |r|
+      r.get_option_first("msg").match(/^"MALWARE\-CNC/)
+    end
+    assert_equal 392, rules.count{|r| ! r.enabled}
+    assert_equal 2735, rules.count{|r| r.enabled}
+    rules.delete do |r|
+      options = r.get_options("content")
+      if options
+        options.find { |o|
+          o.arguments.find { |a|
+            a.match(/"POST"/)
+          }
+        }
+      else
+        nil
+      end
+    end
+    assert_equal 343, rules.count{|r| ! r.enabled}
+    assert_equal 2726, rules.count{|r| r.enabled}
+    rules.delete_all
+    assert_equal 0, rules.length
+    assert_equal 0, rules.count{|r| r.enabled}
+    assert_equal 0, rules.count{|r| ! r.enabled}    
   end
+  
+  # def test_ruleset_load_from_url
+  #   rules = Snort::RuleSet::from_file("http://test.com/community.rules")
+  #   assert_equal 3127, rules.length
+  #   assert_equal 2522, rules.count{|r| ! r.enabled}
+  #   assert_equal 605, rules.count{|r| r.enabled}
+  # end
 end
