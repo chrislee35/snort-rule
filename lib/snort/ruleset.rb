@@ -29,7 +29,7 @@ module Snort
     def RuleSet::from_filehandle(fh)
       rules = RuleSet.new
       fh.each_line do |line|
-        next unless line =~ /(alert|drop|pass|reject|activate|dynamic|activate)/
+        next unless line =~ /(alert|drop|pass|reject|activate|dynamic|activate|sdrop)/
         begin
           rule = Snort::Rule.parse(line)
           if rule
@@ -40,6 +40,26 @@ module Snort
         end
       end
       rules
+    end
+    
+    def to_filehandle(fh)
+      @ruleset.each do |rule|
+        fh.puts rule.to_s
+      end
+    end
+    
+    def to_file(file)
+      i_opened_it = false
+      if file.class == File
+        fh = file
+      else
+        i_opened_it = true
+        fh = open(file.to_s, 'w')
+      end
+      to_filehandle(fh)
+      if i_opened_it
+        fh.close
+      end
     end
     
     def initialize(ruleset=[])

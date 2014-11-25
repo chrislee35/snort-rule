@@ -87,4 +87,26 @@ class TestSnortCommunityRules < Minitest::Test
   #   assert_equal 2522, rules.count{|r| ! r.enabled}
   #   assert_equal 605, rules.count{|r| r.enabled}
   # end
+  
+  def test_writing_file
+    rules = Snort::RuleSet::from_file("test/community-rules/community.rules")
+    assert_equal 3127, rules.length
+    assert_equal 2522, rules.count{|r| ! r.enabled}
+    assert_equal 605, rules.count{|r| r.enabled}
+    rules.to_file("test/community-rules/community.rules.test")
+    assert File.exist?("test/community-rules/community.rules.test")
+    total = enabled = disabled = 0
+    open("test/community-rules/community.rules.test", 'r').each_line do |l|
+      total += 1
+      if l =~ /^#/
+        disabled += 1
+      else
+        enabled += 1
+      end
+    end
+    assert_equal 3127, total
+    assert_equal 2522, disabled
+    assert_equal 605, enabled
+  end
+    
 end

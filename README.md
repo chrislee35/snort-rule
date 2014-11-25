@@ -83,8 +83,11 @@ Or install it yourself as:
     rules.delete_all
 	rules.length # => 0
     rules.count{|r| r.enabled} # => 0
-    rules.count{|r| ! r.enabled} # =>
+    rules.count{|r| ! r.enabled} # => 0
 	
+	ruleset = Snort::RuleSet::from_file("community.rules")
+	ruleset.to_file("new_community.rules")
+		
 
 ## Contributing
 
