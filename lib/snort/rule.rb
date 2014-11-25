@@ -9,6 +9,22 @@ require "snort/rule/option"
 # Copyright:: Copyright (c) 2011 Chris Lee
 # License::   Distributes under the same terms as Ruby
 module Snort
+  
+  class Comment
+    def initialize(comment)
+      @comment = comment
+    end
+    
+    def to_s
+      @comment
+    end
+    
+    def enable
+    end
+    
+    def disable
+    end
+  end
 
   # This class stores and generates the features of a snort rule
   class Rule

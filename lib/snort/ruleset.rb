@@ -29,14 +29,19 @@ module Snort
     def RuleSet::from_filehandle(fh)
       rules = RuleSet.new
       fh.each_line do |line|
-        next unless line =~ /(alert|drop|pass|reject|activate|dynamic|activate|sdrop)/
-        begin
-          rule = Snort::Rule.parse(line)
-          if rule
-            rules << rule
+        if line =~ /(alert|drop|pass|reject|activate|dynamic|activate|sdrop)/
+          begin
+            rule = Snort::Rule.parse(line)
+            if rule
+              rules << rule
+            else
+              rules << Snort::Comment.new(line.strip)
+            end
+          rescue ArgumentError => e
+          rescue NoMethodError => e
           end
-        rescue ArgumentError => e
-        rescue NoMethodError => e
+        else
+          rules << Snort::Comment.new(line.strip)
         end
       end
       rules
@@ -75,16 +80,16 @@ module Snort
     end
     
     def length
-      @ruleset.length
+      @ruleset.find_all {|r| r.class == Snort::Rule}.length
     end
     
     def count(&block)
-      @ruleset.count(&block)
+      @ruleset.find_all {|r| r.class == Snort::Rule}.count(&block)
     end
     
     def enable(&block)
       count = 0
-      @ruleset.each do |rule|
+      @ruleset.find_all {|r| r.class == Snort::Rule}.each do |rule|
         if block.call(rule)
           rule.enable
           count += 1
@@ -95,7 +100,7 @@ module Snort
     
     def disable(&block)
       count = 0
-      @ruleset.each do |rule|
+      @ruleset.find_all {|r| r.class == Snort::Rule}.each do |rule|
         if block.call(rule)
           rule.disable
           count += 1
@@ -106,7 +111,12 @@ module Snort
     
     def delete(&block)
       len = @ruleset.length
-      @ruleset.delete_if(&block)
+      @ruleset.each do |rule|
+        next if rule.class == Snort::Comment
+        if block.call(rule)
+          @ruleset -= [rule]
+        end
+      end
       len - @ruleset.length
     end
     
