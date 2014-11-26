@@ -10,25 +10,9 @@ require "snort/rule/option"
 # License::   Distributes under the same terms as Ruby
 module Snort
   
-  class Comment
-    def initialize(comment)
-      @comment = comment
-    end
-    
-    def to_s
-      @comment
-    end
-    
-    def enable
-    end
-    
-    def disable
-    end
-  end
-
   # This class stores and generates the features of a snort rule
   class Rule
-    attr_accessor :enabled, :action, :proto, :src, :sport, :dir, :dst, :dport, :options_hash
+    attr_accessor :enabled, :action, :proto, :src, :sport, :dir, :dst, :dport, :options_hash, :comments
     attr_reader :options
     
     # Initializes the Rule
@@ -62,13 +46,17 @@ module Snort
           add_option(opt)
         end
       end
+      @comments = kwargs[:comments]
     end
 
     # Output the current object into a snort rule
     def to_s(options_only=false)
       rule = ""
+      if @comments
+        rule += @comments
+      end
       if not @enabled
-        rule = "#"
+        rule += "#"
       end
       rule += [@action, @proto, @src, @sport, @dir, @dst, @dport].join(" ") unless options_only
       if @options.any?

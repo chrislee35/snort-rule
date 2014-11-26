@@ -28,20 +28,25 @@ module Snort
     
     def RuleSet::from_filehandle(fh)
       rules = RuleSet.new
+      comments = ""
       fh.each_line do |line|
         if line =~ /(alert|log|pass|activate|dynamic|drop|reject|sdrop)/
           begin
             rule = Snort::Rule.parse(line)
             if rule
+              if comments.length > 0
+                rule.comments = comments
+                comments = ""
+              end
               rules << rule
             else
-              rules << Snort::Comment.new(line.strip)
+              comments << line
             end
           rescue ArgumentError => e
           rescue NoMethodError => e
           end
         else
-          rules << Snort::Comment.new(line.strip)
+          comments << line
         end
       end
       rules
@@ -80,16 +85,16 @@ module Snort
     end
     
     def length
-      @ruleset.find_all {|r| r.class == Snort::Rule}.length
+      @ruleset.length
     end
     
     def count(&block)
-      @ruleset.find_all {|r| r.class == Snort::Rule}.count(&block)
+      @ruleset.count(&block)
     end
     
     def enable(&block)
       count = 0
-      @ruleset.find_all {|r| r.class == Snort::Rule}.each do |rule|
+      @ruleset.each do |rule|
         if block.call(rule)
           rule.enable
           count += 1
@@ -100,7 +105,7 @@ module Snort
     
     def disable(&block)
       count = 0
-      @ruleset.find_all {|r| r.class == Snort::Rule}.each do |rule|
+      @ruleset.each do |rule|
         if block.call(rule)
           rule.disable
           count += 1
@@ -112,7 +117,6 @@ module Snort
     def delete(&block)
       len = @ruleset.length
       @ruleset.each do |rule|
-        next if rule.class == Snort::Comment
         if block.call(rule)
           @ruleset -= [rule]
         end
