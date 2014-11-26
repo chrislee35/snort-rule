@@ -29,7 +29,7 @@ module Snort
     def RuleSet::from_filehandle(fh)
       rules = RuleSet.new
       fh.each_line do |line|
-        if line =~ /(alert|drop|pass|reject|activate|dynamic|activate|sdrop)/
+        if line =~ /(alert|log|pass|activate|dynamic|drop|reject|sdrop)/
           begin
             rule = Snort::Rule.parse(line)
             if rule

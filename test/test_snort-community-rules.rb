@@ -97,7 +97,7 @@ class TestSnortCommunityRules < Minitest::Test
     assert File.exist?("test/community-rules/community.rules.test")
     total = enabled = disabled = 0
     open("test/community-rules/community.rules.test", 'r').each_line do |l|
-      if l =~ /^(#)?\s*(alert|drop|pass|reject|activate|dynamic|activate|sdrop)/
+      if l =~ /^(#)?\s*(alert|log|pass|activate|dynamic|drop|reject|sdrop)/
         total += 1
         if l =~ /^#/
           disabled += 1
