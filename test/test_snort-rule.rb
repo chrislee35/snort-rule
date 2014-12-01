@@ -94,5 +94,11 @@ class TestSnortRule < Minitest::Test
       Snort::Rule.parse("pass udp 192.168.0.1 bla bla bla 53 ( sid:48; threshold:type limit,track by_src,count 1,seconds 3600; )")
     end
   end
+  
+  def test_dump_rule_to_json
+    require 'json'
+    rule = Snort::Rule.parse("        ### pass udp 192.168.0.1 any <> any 53 (   sid:48;     threshold:type limit,track by_src,count 1,seconds 3600; )")
+    puts rule.to_json
+  end
 
 end

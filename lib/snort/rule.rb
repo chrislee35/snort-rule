@@ -67,6 +67,24 @@ module Snort
       rule
     end
     
+    def to_json(options_only=false)
+      if options_only
+        @options.to_json
+      else
+        {
+          :enabled => @enabled,
+          :action => @action,
+          :proto => @proto,
+          :src => @src,
+          :sport => @sport,
+          :dir => @dir,
+          :dst => @dst,
+          :dport => @dport,
+          :options => @options
+        }.to_json
+      end
+    end
+    
     def enable
       @enabled = true
     end

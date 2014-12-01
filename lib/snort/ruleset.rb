@@ -88,6 +88,10 @@ module Snort
       @ruleset.length
     end
     
+    def each(&block)
+      @ruleset.each(&block)
+    end
+    
     def count(&block)
       @ruleset.count(&block)
     end

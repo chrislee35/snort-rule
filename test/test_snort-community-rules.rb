@@ -51,6 +51,11 @@ class TestSnortCommunityRules < Minitest::Test
     assert_equal 2522, rules.count{|r| ! r.enabled}
     assert_equal 605, rules.count{|r| r.enabled}
     rules.disable_all
+    count = 0
+    rules.each do |rule|
+      count += 1
+    end
+    assert_equal 3127, count
     assert_equal 0, rules.count{|r| r.enabled}
     assert_equal 3127, rules.count{|r| ! r.enabled}
     rules.enable_all
