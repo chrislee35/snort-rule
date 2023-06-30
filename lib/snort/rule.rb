@@ -80,8 +80,7 @@ module Snort
           :dir => @dir,
           :dst => @dst,
           :dport => @dport,
-          :options => @options
-        }.to_json
+        }.merge(@options_hash).to_json
       end
     end
     

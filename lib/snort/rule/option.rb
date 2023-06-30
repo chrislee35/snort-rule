@@ -9,7 +9,7 @@ module Snort
       @keyword = keyword.to_s
       if arguments == nil
         @arguments = []
-      elsif arguments.class == String or arguments.class == Fixnum
+      elsif arguments.class == String or arguments.class == Integer
         @arguments = [arguments]
       elsif arguments.class == Array
         @arguments = arguments
@@ -25,6 +25,10 @@ module Snort
     def to_s
       return "#{@keyword};" if @arguments.length == 0
       "#{@keyword}:#{@arguments.join("; ")};"
+    end
+    
+    def to_json(arg)
+      return "\"#{@arguments.join("; ")}\""
     end
 
     def ==(other)
